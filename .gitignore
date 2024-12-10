@@ -11,3 +11,4 @@ __pycache__/
 .Python
 fuhui_dev/
 bakcup/
+git-pre-push-hook-warn.log
