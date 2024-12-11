@@ -1,0 +1,14 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+.idea/
+
+# Distribution / packaging
+.Python
+fuhui_dev/
+bakcup/
+git-pre-push-hook-warn.log

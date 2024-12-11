@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLMs Chat Page</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        #chatbox {
+            border: 1px solid #ccc;
+            padding: 10px;
+            height: 500px;
+            overflow-y: scroll;
+            margin-bottom: 10px;
+            font-size: 16px; /* 增加字体大小 */
+            line-height: 1.5; /* 增加行高 */
+        }
+        .user { color: blue; }
+        .model { color: green; }
+        #input_container { display: flex; }
+        #user_input {
+            flex: 1;
+            padding: 10px;
+            font-size: 16px; /* 增加输入框字体大小 */
+        }
+        button { padding: 10px; font-size: 16px; } /* 增加按钮字体大小 */
+        #streaming { margin: 10px 0; }
+        #model_selection { margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <h1>LLMs Chat</h1>
+    <div id="chatbox"></div>
+    <div id="streaming">
+        <label>
+            <input type="checkbox" id="streaming_checkbox">
+            启用流式输出
+        </label>
+    </div>
+    <div id="model_selection">
+        <label for="model_select">选择模型：</label>
+        <select id="model_select">
+            <option value="qwen2:0.5b">qwen2:0.5b</option>
+            <!-- 添加更多模型选项 -->
+            <option value="gpt-3">gpt-3</option>
+            <option value="bert-base">bert-base</option>
+        </select>
+    </div>
+    <div id="input_container">
+        <input type="text" id="user_input" placeholder="输入您的消息..." onkeypress="checkEnter(event)">
+        <button onclick="sendMessage()">发送</button>
+    </div>
+    <script>
+        function sendMessage() {
+            var user_input = document.getElementById("user_input").value;
+            if (user_input.trim() === "") return; // 防止发送空消息
+            document.getElementById("chatbox").innerHTML += "<div class='user'>用户: " + escapeHtml(user_input) + "</div>";
+            document.getElementById("user_input").value = '';
+
+            var isStreaming = document.getElementById('streaming_checkbox').checked;
+            var selectedModel = document.getElementById('model_select').value;
+
+            fetch('/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    'user_input': user_input,
+                    'model': selectedModel
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (isStreaming) {
+                    displayStreamingReply(data.reply);
+                } else {
+                    document.getElementById("chatbox").innerHTML += "<div class='model'>机器人: " + escapeHtml(data.reply) + "</div>";
+                    scrollToBottom();
+                }
+            })
+            .catch(error => {
+                console.error('错误:', error);
+                document.getElementById("chatbox").innerHTML += "<div class='model'>机器人: 出现错误，请稍后再试。</div>";
+                scrollToBottom();
+            });
+        }
+
+        function displayStreamingReply(reply) {
+            let replyContainer = document.createElement('div');
+            replyContainer.className = 'model';
+            replyContainer.innerHTML = "机器人: ";
+            document.getElementById("chatbox").appendChild(replyContainer);
+            scrollToBottom();
+
+            let charIndex = 0;
+            let interval = setInterval(() => {
+                if (charIndex < reply.length) {
+                    replyContainer.innerHTML += escapeHtml(reply[charIndex]);
+                    charIndex++;
+                    scrollToBottom();
+                } else {
+                    clearInterval(interval);
+                }
+            }, 20); // 每20毫秒输出一个字符
+        }
+
+        function scrollToBottom() {
+            var chatbox = document.getElementById("chatbox");
+            chatbox.scrollTop = chatbox.scrollHeight;
+        }
+
+        function checkEnter(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function escapeHtml(text) {
+            var map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+        }
+    </script>
+</body>
+</html>
