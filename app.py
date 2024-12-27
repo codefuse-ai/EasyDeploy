@@ -73,13 +73,25 @@ async def generate(request: Request):
     request_dict = await request.json()
     model = request_dict.get("model", "")
     messages = request_dict.get("messages", dict())
-    stream = request_dict.get("stream", False)
     prompt = messages[-1].get("content", "")
+    stream = request_dict.get("stream", False)
+
+    infer_param = request_dict.get("infer_param", dict())
+    max_tokens = infer_param.get('max_tokens', 4096)
+    temperature = infer_param.get('temperature', 0.9)
+    top_p = infer_param.get('top_p', 0.9)
+    n = infer_param.get('n', 1)
+    stop = infer_param.get('stop', [])
 
     data = {
         "model": model,
         "prompt": prompt,
-        "stream": stream
+        "stream": stream,
+        "max_tokens": max_tokens,
+        "temperature": temperature,
+        "top_p": top_p,
+        "n": n,
+        "stop": stop,
     }
     # url_generate = "http://127.0.0.1:11434/api/generate"
 
