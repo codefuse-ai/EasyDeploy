@@ -10,8 +10,7 @@ RUN pip3 install jinja2
 ENV PYTHONPATH /workspace/code-repo
 
 RUN apt-get update && apt-get install -y curl
-
-#RUN curl -fsSL https://ollama.com/install.sh | sh
+RUN curl -fsSL https://ollama.com/install.sh | sh
 #RUN ollama serve
 #RUN ollama run llama3.2
 
