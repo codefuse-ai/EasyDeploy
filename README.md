@@ -224,8 +224,6 @@ import os
 from vllm import LLM
 from vllm.sampling_params import SamplingParams
 
-# os.environ['LD_LIBRARY_PATH'] = '/root/miniconda3/lib/python3.10/site-packages/nvidia/cublas/lib'
-# model_path = '/mnt/modelops/models/Bailing_Code_MoE_Lite_4K_Chat_20250304_dpsk_gptq_int4'
 model_path = '{your model path}'
 
 enforce_eager = False
