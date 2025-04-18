@@ -8,7 +8,8 @@ def run():
     prompt = 'hello'
     model = 'llama3.2'
     messages = [{"role": "user", "content": prompt}]
-    data = {'model': model, 'messages': messages}
+    infer_param = {}
+    data = {'engine': 'ollama', 'model': model, 'messages': messages, 'infer_param':  infer_param}
     headers = {"Content-Type": "application/json"}
     response = requests.post(url, headers=headers, data=json.dumps(data))
 

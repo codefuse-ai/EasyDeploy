@@ -1,0 +1,15 @@
+# docker-compose.yml
+version: '3.8'
+services:
+  app:
+    build: .
+    container_name: app
+    command: sh -c "ollama serve && ollama run llama3.2 && uvicorn app:app --host 0.0.0.0 --port 8000"
+    depends_on:
+      - ollama
+    ports:
+      - "8000:8000"
+    restart: always
+
+volumes:
+  ollama-storage:
